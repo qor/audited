@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/jinzhu/gorm"
-	"github.com/qor/qor/audited"
+	"github.com/qor/audited"
 	"github.com/qor/qor/test/utils"
 )
 
