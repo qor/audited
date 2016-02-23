@@ -1,10 +1,12 @@
 # Audited
 
-Audited is a [GORM](https://github.com/jinzhu/gorm) extension, used to save last UpdatedBy and CreatedBy for models
+Audited is used to log last UpdatedBy and CreatedBy for your models
+
+[![GoDoc](https://godoc.org/github.com/qor/audited?status.svg)](https://godoc.org/github.com/qor/audited)
 
 ### Register GORM Callbacks
 
-Audited is using [GORM](https://github.com/jinzhu/gorm)'s callbacks to handle audited, so you need to register callbacks to gorm DB first, do it like:
+Audited is using [GORM](https://github.com/jinzhu/gorm) callbacks to log data, so you need to register callbacks first:
 
 ```go
 import (
@@ -12,14 +14,13 @@ import (
   "github.com/qor/audited"
 )
 
-db, err := gorm.Open("sqlite3", "demo_db") // [gorm](https://github.com/jinzhu/gorm)
-
+db, err := gorm.Open("sqlite3", "demo_db")
 audited.RegisterCallbacks(db)
 ```
 
 ### Make Model Auditable
 
-Embed `audited.AuditedModel` into your model as anonymous field, like:
+Embed `audited.AuditedModel` into your model as anonymous field to make the model auditable
 
 ```go
 type Product struct {
@@ -32,25 +33,28 @@ type Product struct {
 ### Usage
 
 ```go
-var currentUser = User{ID: 100}
-var product Product
-var db, err = gorm.Open("sqlite3", "demo_db")
-// ...
+import "github.com/qor/audited"
+import "github.com/jinzhu/gorm"
 
-// Create will set product's CreatedBy, UpdatedBy to current user's primary key if it is a valid model
-db.Set("audited:current_user", currentUser).Create(&product)
-// product.CreatedBy => 100
-// product.UpdatedBy => 100
+func main() {
+  var db, err = gorm.Open("sqlite3", "demo_db")
+  var currentUser = User{ID: 100}
+  var product Product
 
-// If not a valid model, then will set CreatedBy, UpdatedBy to current_user's value
-db.Set("audited:current_user", "admin").Create(&product)
-// product.CreatedBy => "admin"
-// product.UpdatedBy => "admin"
+  // Create will set product's `CreatedBy`, `UpdatedBy` to `currentUser`'s primary key if `audited:current_user` is a valid model
+  db.Set("audited:current_user", currentUser).Create(&product)
+  // product.CreatedBy => 100
+  // product.UpdatedBy => 100
 
-// Saveing a record without primary key will also trigger `Create`, so CreatedBy, UpdatedBy will be updated
-// When saving a record has primary key, then it will only update the `UpdatedBy`
-db.Set("audited:current_user", "dev").Save(&product)
-// product.UpdatedBy => "dev"
+  // If it is not a valid model, then will set `CreatedBy`, `UpdatedBy` to it's value
+  db.Set("audited:current_user", "admin").Create(&product)
+  // product.CreatedBy => "admin"
+  // product.UpdatedBy => "admin"
+
+  // When updating a record, it will update the `UpdatedBy` to `audited:current_user`'s value
+  db.Set("audited:current_user", "dev").Model(&product).Update("Code", "L1212")
+  // product.UpdatedBy => "dev"
+}
 ```
 
 ## [Qor Support](https://github.com/qor/qor)
@@ -61,7 +65,7 @@ Audited could be used alone, and it works nicely with QOR, if you have requireme
 
 [QOR Demo:  http://demo.getqor.com/admin](http://demo.getqor.com/admin)
 
-When use Audited with qor, if you has embedded `audited.AuditedModel` for any models, the model will be tracked when do creating/updating with Qor Admin
+To use Audited with qor, just embedded `audited.AuditedModel` for a model, it will be tracked when do creating/updating in Qor Admin
 
 ## License
 

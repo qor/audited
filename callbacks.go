@@ -68,6 +68,7 @@ func assignUpdatedBy(scope *gorm.Scope) {
 	}
 }
 
+// RegisterCallbacks register callback into GORM DB
 func RegisterCallbacks(db *gorm.DB) {
 	callback := db.Callback()
 	callback.Create().After("gorm:before_create").Register("audited:assign_created_by", assignCreatedBy)
