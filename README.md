@@ -4,6 +4,10 @@ Audited is used to record the last User who created and/or updated your [GORM](h
 
 [![GoDoc](https://godoc.org/github.com/qor/audited?status.svg)](https://godoc.org/github.com/qor/audited)
 
+## Documentation
+
+<https://doc.getqor.com/plugins/audited.html>
+
 ### Register GORM Callbacks
 
 Audited utilises [GORM](https://github.com/jinzhu/gorm) callbacks to log data, so you will need to register callbacks first:
