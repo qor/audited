@@ -71,6 +71,10 @@ func assignUpdatedBy(scope *gorm.Scope) {
 // RegisterCallbacks register callback into GORM DB
 func RegisterCallbacks(db *gorm.DB) {
 	callback := db.Callback()
-	callback.Create().After("gorm:before_create").Register("audited:assign_created_by", assignCreatedBy)
-	callback.Update().After("gorm:before_update").Register("audited:assign_updated_by", assignUpdatedBy)
+	if callback.Create().Get("audited:assign_created_by") == nil {
+		callback.Create().After("gorm:before_create").Register("audited:assign_created_by", assignCreatedBy)
+	}
+	if callback.Update().Get("audited:assign_updated_by") == nil {
+		callback.Update().After("gorm:before_update").Register("audited:assign_updated_by", assignUpdatedBy)
+	}
 }
